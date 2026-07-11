@@ -1,3 +1,4 @@
+
 import 'package:employee_app/core/color/theme.dart';
 import 'package:employee_app/features/login/provider/login_provider.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,24 @@ class DashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 64,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Center(
+            child: ClipOval(
+              child: Image.asset(
+                'assets/logo/Ethiopian_Airlines_idbCkgr4HW_1.png',
+                width: 40,
+                height: 36,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  debugPrint('Access page logo load error: $error');
+                  return const Icon(Icons.airplanemode_active, color: AppTheme.brandGreen);
+                },
+              ),
+            ),
+          ),
+        ),
         title: const Text('Workspace Hub'),
         actions: [
           IconButton(
@@ -54,33 +73,90 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView.builder(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        itemCount: websites.length,
-        itemBuilder: (context, index) {
-          final site = websites[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: AppTheme.brandGreen.withOpacity(0.1), shape: BoxShape.circle),
-                child: const Icon(Icons.language_rounded, color: AppTheme.brandGreen),
-              ),
-              title: Text(site.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(site.description, style: TextStyle(color: Colors.grey[500], fontSize: 13)),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => WebViewPage(title: site.title, description: site.description, url: site.url, highlights: site.highlights)),
-                );
-              },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            const Text(
+              'Employee Website Access Portal',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
-          );
-        },
+            const SizedBox(height: 12),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final crossAxis = constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 600 ? 2 : 1);
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxis,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 14,
+                      childAspectRatio: crossAxis == 1 ? 3.8 : 1.8,
+                    ),
+                    itemCount: websites.length,
+                    itemBuilder: (context, index) {
+                      final site = websites[index];
+                      return Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WebViewPage(
+                                  title: site.title,
+                                  description: site.description,
+                                  url: site.url,
+                                  highlights: site.highlights,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(color: AppTheme.brandGreen.withOpacity(0.1), shape: BoxShape.circle),
+                                  child: const Icon(Icons.language_rounded, color: AppTheme.brandGreen),
+                                ),
+                                const SizedBox(width: 12),
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                        child: Text(site.title, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Flexible(
+                                        child: Text(site.description, style: TextStyle(color: Colors.grey[600], fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -107,6 +183,7 @@ class WebViewPage extends StatelessWidget {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
